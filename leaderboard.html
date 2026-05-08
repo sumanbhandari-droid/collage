@@ -49,9 +49,26 @@
 </main>
 <script>
 const data=JSON.parse(localStorage.getItem('neb_leaderboard')||'[]');
-function draw(filter='all'){const arr=data.filter(r=>filter==='all'||String(r.grade)===String(filter)).sort((a,b)=>b.score-a.score).slice(0,20);const wrap=document.getElementById('leaderWrap');wrap.innerHTML=arr.map((r,i)=>`<div class="leader-row d-flex justify-content-between"><span>${i<3?'<span class="medal">'+['🥇','🥈','🥉'][i]+'</span>':''} ${i+1}. ${r.name}</span><span>${r.score} • Grade ${r.grade} • ${r.date||''}</span></div>`).join('')||'<p>No records yet.</p>';}
- draw(); document.querySelectorAll('#lbTabs .nav-link').forEach(b=>b.onclick=()=>{document.querySelectorAll('#lbTabs .nav-link').forEach(x=>x.classList.remove('active'));b.classList.add('active');draw(b.dataset.filter)});
- fetch('api/leaderboard.php').then(r=>r.json()).then(api=>{if(Array.isArray(api)&&api.length){localStorage.setItem('neb_leaderboard',JSON.stringify(api));location.reload();}}).catch(()=>{});
+function draw(filter='all'){
+  const arr=data.filter(r=>filter==='all'||String(r.grade)===String(filter)).sort((a,b)=>b.score-a.score).slice(0,20);
+  const wrap=document.getElementById('leaderWrap');
+  wrap.textContent='';
+  if(!arr.length){const p=document.createElement('p');p.textContent='No records yet.';wrap.appendChild(p);return;}
+  arr.forEach((r,i)=>{
+    const row=document.createElement('div');
+    row.className='leader-row d-flex justify-content-between';
+    const left=document.createElement('span');
+    if(i<3){const medal=document.createElement('span');medal.className='medal';medal.textContent=['🥇','🥈','🥉'][i];left.appendChild(medal);left.append(' ');}
+    left.append(`${i+1}. ${r?.name ?? 'Student'}`);
+    const right=document.createElement('span');
+    right.textContent=`${Number(r?.score||0)} • Grade ${Number(r?.grade||0)} • ${r?.date ?? ''}`;
+    row.append(left,right);
+    wrap.appendChild(row);
+  });
+}
+draw();
+document.querySelectorAll('#lbTabs .nav-link').forEach(b=>b.onclick=()=>{document.querySelectorAll('#lbTabs .nav-link').forEach(x=>x.classList.remove('active'));b.classList.add('active');draw(b.dataset.filter)});
+fetch('api/leaderboard.php').then(r=>r.json()).then(api=>{if(Array.isArray(api)&&api.length){localStorage.setItem('neb_leaderboard',JSON.stringify(api));location.reload();}}).catch(()=>{});
 </script>
 
 <footer class="site-footer py-4 mt-5">

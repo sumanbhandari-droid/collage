@@ -6,5 +6,5 @@ try {
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch(PDOException $e) {
     http_response_code(500);
-    die(json_encode(['error' => 'Database connection failed']));
+    die(json_encode(['error' => 'Server error']));
 }
