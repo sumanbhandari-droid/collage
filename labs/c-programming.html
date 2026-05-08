@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C Programming Lab</title>
+<meta name="description" content="Interactive C programming exercises">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<link href="../assets/css/main.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css"><link rel="stylesheet" href="../assets/css/labs.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="../index.html">NEB CS</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item"><a class="nav-link" href="../index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="../grade11/index.html">Grade 11</a></li>
+        <li class="nav-item"><a class="nav-link" href="../grade12/index.html">Grade 12</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Labs</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="../labs/c-programming.html">C Programming</a></li>
+            <li><a class="dropdown-item" href="../labs/html-css.html">HTML/CSS</a></li>
+            <li><a class="dropdown-item" href="../labs/php.html">PHP</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="../quiz/index.html">Quiz</a></li>
+        <li class="nav-item"><a class="nav-link" href="../games/index.html">Games</a></li>
+        <li class="nav-item"><a class="nav-link" href="../leaderboard.html">Leaderboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="../admin/index.php">Admin</a></li>
+        <li class="nav-item ms-lg-2"><button id="themeToggle" class="btn btn-sm btn-accent" type="button"><i class="fa-solid fa-moon"></i></button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header class="hero"><div class="container hero-content"><h1>C Programming Lab</h1><p>30+ guided exercises with hints and solution reveal.</p></div></header>
+<main class="container py-4 lab-layout">
+<aside class="glass-card p-3 exercise-list"><h5>Exercises</h5><div id="cExerciseList"></div></aside>
+<section>
+<div class="glass-card p-3 mb-3"><h4 id="cTitle"></h4><p id="cProblem"></p><textarea id="cEditor"></textarea><button id="markDoneBtn" class="btn btn-accent mt-2">Mark Completed</button></div>
+<div class="row g-3"><div class="col-md-6"><div class="glass-card p-3"><h6>Hint</h6><p id="cHint"></p></div></div><div class="col-md-6"><div class="glass-card p-3"><h6>Solution</h6><pre id="cSolution"></pre></div></div></div>
+<div class="output-pane mt-3" id="expectedOutput">Expected Output</div>
+</section>
+</main>
+
+<footer class="site-footer py-4 mt-5">
+  <div class="container d-flex flex-wrap justify-content-between gap-3">
+    <div>© 2026 NEB Computer Science</div>
+    <div class="d-flex gap-3">
+      <a href="../grade11/index.html">Grade 11</a>
+      <a href="../grade12/index.html">Grade 12</a>
+      <a href="../quiz/index.html">Quiz</a>
+      <a href="../admin/index.php">Admin</a>
+    </div>
+  </div>
+</footer>
+<button class="scroll-top" id="scrollTop"><i class="fa-solid fa-arrow-up"></i></button>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../assets/js/main.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script><script src="../assets/js/code-editor.js"></script>
+</body>
+</html>
