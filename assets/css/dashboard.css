@@ -1,0 +1,5 @@
+
+body{margin:0;font-family:Inter,sans-serif;background:#edf1ff}.admin-wrap{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.sidebar{background:#141b4d;color:#fff;padding:1rem}.sidebar a{display:block;color:#e1e7ff;padding:.6rem;border-radius:8px}.sidebar a:hover{background:#24307a}
+.main{padding:1.2rem}.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem}.cardx{background:#fff;border-radius:14px;padding:1rem;box-shadow:0 8px 20px rgba(0,0,0,.08)}
+.table-wrap{overflow:auto}.btn{padding:.45rem .8rem;border-radius:10px;border:none;background:#1a237e;color:#fff}

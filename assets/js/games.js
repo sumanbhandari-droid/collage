@@ -1,0 +1,16 @@
+
+class BinaryGame{constructor(){this.score=0;this.t=60;this.next();this.tick();}
+next(){this.n=Math.floor(Math.random()*256);document.getElementById('binaryNumber').textContent=this.n;}
+check(){const i=document.getElementById('binaryInput').value.trim();const b=this.n.toString(2);if(i===b){this.score++;nebToast('Correct');}else nebToast('Wrong: '+b);document.getElementById('binaryScore').textContent=this.score;this.next();}
+tick(){const el=document.getElementById('binaryTimer');const id=setInterval(()=>{this.t--;el.textContent=this.t;if(this.t<=0){clearInterval(id);localStorage.setItem('binary_high',Math.max(this.score,+(localStorage.getItem('binary_high')||0)));}},1000);}}
+class MemoryMatchGame{constructor(){this.moves=0;this.start=Date.now();this.open=[];this.done=0;const vals=['AND','OR','NOT','NAND','NOR','XOR','XNOR','BUFFER'];this.cards=[...vals,...vals].sort(()=>Math.random()-0.5);this.draw();}
+draw(){const b=document.getElementById('memoryBoard');b.innerHTML='';this.cards.forEach((v,i)=>{const c=document.createElement('button');c.className='btn btn-outline-primary m-1';c.textContent='?';c.onclick=()=>this.flip(c,v,i);b.appendChild(c)})}
+flip(c,v,i){if(c.disabled||this.open.length===2)return;c.textContent=v;this.open.push({c,v,i});if(this.open.length===2){this.moves++;document.getElementById('memoryMoves').textContent=this.moves;const [a,b]=this.open;if(a.v===b.v){a.c.disabled=b.c.disabled=true;this.done+=2;if(this.done===16)nebToast('You won memory match!');this.open=[]}else setTimeout(()=>{a.c.textContent=b.c.textContent='?';this.open=[]},500)}}}
+class QuizBlitzGame{constructor(){this.q=[['CPU is brain of computer',true],['HTTP is email protocol',false],['IPv6 is 128-bit',true],['SQL means Simple Query Link',false]];this.i=0;this.s=0;this.t=30;this.render();this.tick();}
+render(){if(this.i>=this.q.length)this.i=0;document.getElementById('blitzQ').textContent=this.q[this.i][0];document.getElementById('blitzScore').textContent=this.s;}
+answer(v){if(this.t<=0)return;const ok=v===this.q[this.i][1];this.s+=ok?2:0;nebToast(ok?'Correct':'Wrong');this.i++;this.render();}
+tick(){const id=setInterval(()=>{this.t--;document.getElementById('blitzTimer').textContent=this.t;if(this.t<=0)clearInterval(id);},1000)}}
+class TopologyQuizGame{constructor(){this.q=[['Central node connects all devices','Star'],['All nodes in circular path','Ring'],['Backbone cable shared','Bus'],['Every node connected to every node','Mesh']];this.i=0;this.s=0;this.ask();}
+ask(){const [d]=this.q[this.i%this.q.length];document.getElementById('topologyDesc').textContent=d;document.getElementById('topologyScore').textContent=this.s;}
+check(name){const ans=this.q[this.i%this.q.length][1];if(name===ans){this.s++;nebToast('Correct')}else nebToast('Answer: '+ans);this.i++;if(this.i>=10){nebToast('Round complete')}this.ask();}}
+let bg,mg,qb,tg;document.addEventListener('DOMContentLoaded',()=>{if(document.getElementById('binaryNumber')){bg=new BinaryGame();document.getElementById('binaryCheck').onclick=()=>bg.check();mg=new MemoryMatchGame();qb=new QuizBlitzGame();tg=new TopologyQuizGame();document.querySelectorAll('[data-blitz]').forEach(b=>b.onclick=()=>qb.answer(b.dataset.blitz==='true'));document.querySelectorAll('[data-topology]').forEach(b=>b.onclick=()=>tg.check(b.dataset.topology));}});

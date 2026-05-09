@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grade 12 Past Questions</title>
+<meta name="description" content="Grade 12 NEB past questions with answers and memory tricks">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<link href="../../assets/css/main.css" rel="stylesheet">
+
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="../../index.html">NEB CS</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item"><a class="nav-link" href="../../index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="../../grade11/index.html">Grade 11</a></li>
+        <li class="nav-item"><a class="nav-link" href="../../grade12/index.html">Grade 12</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Labs</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="../../labs/c-programming.html">C Programming</a></li>
+            <li><a class="dropdown-item" href="../../labs/html-css.html">HTML/CSS</a></li>
+            <li><a class="dropdown-item" href="../../labs/php.html">PHP</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="../../quiz/index.html">Quiz</a></li>
+        <li class="nav-item"><a class="nav-link" href="../../games/index.html">Games</a></li>
+        <li class="nav-item"><a class="nav-link" href="../../leaderboard.html">Leaderboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="../../admin/index.php">Admin</a></li>
+        <li class="nav-item ms-lg-2"><button id="themeToggle" class="btn btn-sm btn-accent" type="button"><i class="fa-solid fa-moon"></i></button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header class="hero"><div class="container hero-content"><div class="breadcrumb-wrap"><a href="../../index.html">Home</a> / Grade 12 / Past Questions</div><h1>Grade 12 Past Questions</h1><p>Filter by year/topic, search quickly, and track learned questions.</p></div></header>
+<main class="container py-5">
+<div class="glass-card p-3 mb-3"><input id="searchQ" class="form-control" placeholder="Search question..."></div>
+<div id="yearFilters" class="d-flex flex-wrap gap-2 mb-2"></div>
+<div id="topicFilters" class="d-flex flex-wrap gap-2 mb-3"></div>
+<div class="mb-3">Progress: <strong id="learnedProgress">0/55</strong></div>
+<div id="questionList"></div>
+</main>
+<script>
+const PAST_QUESTIONS = [{"id": 1, "year": 2075, "topic": "Numerical", "question": "Advanced SQL joins question 1", "answer": "Structured answer for advanced sql joins question 1 with definition, diagram and example.", "memory": ""}, {"id": 2, "year": 2076, "topic": "Programming", "question": "ACID properties question 2", "answer": "Structured answer for acid properties question 2 with definition, diagram and example.", "memory": ""}, {"id": 3, "year": 2077, "topic": "Networking", "question": "ER diagram question 3", "answer": "Structured answer for er diagram question 3 with definition, diagram and example.", "memory": ""}, {"id": 4, "year": 2078, "topic": "DBMS", "question": "Subnetting CIDR question 4", "answer": "Structured answer for subnetting cidr question 4 with definition, diagram and example.", "memory": "Quick cue 4"}, {"id": 5, "year": 2079, "topic": "Security", "question": "PHP forms question 5", "answer": "Structured answer for php forms question 5 with definition, diagram and example.", "memory": ""}, {"id": 6, "year": 2080, "topic": "Theory", "question": "HTML5 semantics question 6", "answer": "Structured answer for html5 semantics question 6 with definition, diagram and example.", "memory": ""}, {"id": 7, "year": 2074, "topic": "Numerical", "question": "C++ polymorphism question 7", "answer": "Structured answer for c++ polymorphism question 7 with definition, diagram and example.", "memory": ""}, {"id": 8, "year": 2075, "topic": "Programming", "question": "SDLC models question 8", "answer": "Structured answer for sdlc models question 8 with definition, diagram and example.", "memory": "Quick cue 8"}, {"id": 9, "year": 2076, "topic": "Networking", "question": "AI and ML question 9", "answer": "Structured answer for ai and ml question 9 with definition, diagram and example.", "memory": ""}, {"id": 10, "year": 2077, "topic": "DBMS", "question": "Cloud computing question 10", "answer": "Structured answer for cloud computing question 10 with definition, diagram and example.", "memory": ""}, {"id": 11, "year": 2078, "topic": "Security", "question": "Linked list in C question 11", "answer": "Structured answer for linked list in c question 11 with definition, diagram and example.", "memory": ""}, {"id": 12, "year": 2079, "topic": "Theory", "question": "File handling in C question 12", "answer": "Structured answer for file handling in c question 12 with definition, diagram and example.", "memory": "Quick cue 12"}, {"id": 13, "year": 2080, "topic": "Numerical", "question": "Advanced SQL joins question 13", "answer": "Structured answer for advanced sql joins question 13 with definition, diagram and example.", "memory": ""}, {"id": 14, "year": 2074, "topic": "Programming", "question": "ACID properties question 14", "answer": "Structured answer for acid properties question 14 with definition, diagram and example.", "memory": ""}, {"id": 15, "year": 2075, "topic": "Networking", "question": "ER diagram question 15", "answer": "Structured answer for er diagram question 15 with definition, diagram and example.", "memory": ""}, {"id": 16, "year": 2076, "topic": "DBMS", "question": "Subnetting CIDR question 16", "answer": "Structured answer for subnetting cidr question 16 with definition, diagram and example.", "memory": "Quick cue 16"}, {"id": 17, "year": 2077, "topic": "Security", "question": "PHP forms question 17", "answer": "Structured answer for php forms question 17 with definition, diagram and example.", "memory": ""}, {"id": 18, "year": 2078, "topic": "Theory", "question": "HTML5 semantics question 18", "answer": "Structured answer for html5 semantics question 18 with definition, diagram and example.", "memory": ""}, {"id": 19, "year": 2079, "topic": "Numerical", "question": "C++ polymorphism question 19", "answer": "Structured answer for c++ polymorphism question 19 with definition, diagram and example.", "memory": ""}, {"id": 20, "year": 2080, "topic": "Programming", "question": "SDLC models question 20", "answer": "Structured answer for sdlc models question 20 with definition, diagram and example.", "memory": "Quick cue 20"}, {"id": 21, "year": 2074, "topic": "Networking", "question": "AI and ML question 21", "answer": "Structured answer for ai and ml question 21 with definition, diagram and example.", "memory": ""}, {"id": 22, "year": 2075, "topic": "DBMS", "question": "Cloud computing question 22", "answer": "Structured answer for cloud computing question 22 with definition, diagram and example.", "memory": ""}, {"id": 23, "year": 2076, "topic": "Security", "question": "Linked list in C question 23", "answer": "Structured answer for linked list in c question 23 with definition, diagram and example.", "memory": ""}, {"id": 24, "year": 2077, "topic": "Theory", "question": "File handling in C question 24", "answer": "Structured answer for file handling in c question 24 with definition, diagram and example.", "memory": "Quick cue 24"}, {"id": 25, "year": 2078, "topic": "Numerical", "question": "Advanced SQL joins question 25", "answer": "Structured answer for advanced sql joins question 25 with definition, diagram and example.", "memory": ""}, {"id": 26, "year": 2079, "topic": "Programming", "question": "ACID properties question 26", "answer": "Structured answer for acid properties question 26 with definition, diagram and example.", "memory": ""}, {"id": 27, "year": 2080, "topic": "Networking", "question": "ER diagram question 27", "answer": "Structured answer for er diagram question 27 with definition, diagram and example.", "memory": ""}, {"id": 28, "year": 2074, "topic": "DBMS", "question": "Subnetting CIDR question 28", "answer": "Structured answer for subnetting cidr question 28 with definition, diagram and example.", "memory": "Quick cue 28"}, {"id": 29, "year": 2075, "topic": "Security", "question": "PHP forms question 29", "answer": "Structured answer for php forms question 29 with definition, diagram and example.", "memory": ""}, {"id": 30, "year": 2076, "topic": "Theory", "question": "HTML5 semantics question 30", "answer": "Structured answer for html5 semantics question 30 with definition, diagram and example.", "memory": ""}, {"id": 31, "year": 2077, "topic": "Numerical", "question": "C++ polymorphism question 31", "answer": "Structured answer for c++ polymorphism question 31 with definition, diagram and example.", "memory": ""}, {"id": 32, "year": 2078, "topic": "Programming", "question": "SDLC models question 32", "answer": "Structured answer for sdlc models question 32 with definition, diagram and example.", "memory": "Quick cue 32"}, {"id": 33, "year": 2079, "topic": "Networking", "question": "AI and ML question 33", "answer": "Structured answer for ai and ml question 33 with definition, diagram and example.", "memory": ""}, {"id": 34, "year": 2080, "topic": "DBMS", "question": "Cloud computing question 34", "answer": "Structured answer for cloud computing question 34 with definition, diagram and example.", "memory": ""}, {"id": 35, "year": 2074, "topic": "Security", "question": "Linked list in C question 35", "answer": "Structured answer for linked list in c question 35 with definition, diagram and example.", "memory": ""}, {"id": 36, "year": 2075, "topic": "Theory", "question": "File handling in C question 36", "answer": "Structured answer for file handling in c question 36 with definition, diagram and example.", "memory": "Quick cue 36"}, {"id": 37, "year": 2076, "topic": "Numerical", "question": "Advanced SQL joins question 37", "answer": "Structured answer for advanced sql joins question 37 with definition, diagram and example.", "memory": ""}, {"id": 38, "year": 2077, "topic": "Programming", "question": "ACID properties question 38", "answer": "Structured answer for acid properties question 38 with definition, diagram and example.", "memory": ""}, {"id": 39, "year": 2078, "topic": "Networking", "question": "ER diagram question 39", "answer": "Structured answer for er diagram question 39 with definition, diagram and example.", "memory": ""}, {"id": 40, "year": 2079, "topic": "DBMS", "question": "Subnetting CIDR question 40", "answer": "Structured answer for subnetting cidr question 40 with definition, diagram and example.", "memory": "Quick cue 40"}, {"id": 41, "year": 2080, "topic": "Security", "question": "PHP forms question 41", "answer": "Structured answer for php forms question 41 with definition, diagram and example.", "memory": ""}, {"id": 42, "year": 2074, "topic": "Theory", "question": "HTML5 semantics question 42", "answer": "Structured answer for html5 semantics question 42 with definition, diagram and example.", "memory": ""}, {"id": 43, "year": 2075, "topic": "Numerical", "question": "C++ polymorphism question 43", "answer": "Structured answer for c++ polymorphism question 43 with definition, diagram and example.", "memory": ""}, {"id": 44, "year": 2076, "topic": "Programming", "question": "SDLC models question 44", "answer": "Structured answer for sdlc models question 44 with definition, diagram and example.", "memory": "Quick cue 44"}, {"id": 45, "year": 2077, "topic": "Networking", "question": "AI and ML question 45", "answer": "Structured answer for ai and ml question 45 with definition, diagram and example.", "memory": ""}, {"id": 46, "year": 2078, "topic": "DBMS", "question": "Cloud computing question 46", "answer": "Structured answer for cloud computing question 46 with definition, diagram and example.", "memory": ""}, {"id": 47, "year": 2079, "topic": "Security", "question": "Linked list in C question 47", "answer": "Structured answer for linked list in c question 47 with definition, diagram and example.", "memory": ""}, {"id": 48, "year": 2080, "topic": "Theory", "question": "File handling in C question 48", "answer": "Structured answer for file handling in c question 48 with definition, diagram and example.", "memory": "Quick cue 48"}, {"id": 49, "year": 2074, "topic": "Numerical", "question": "Advanced SQL joins question 49", "answer": "Structured answer for advanced sql joins question 49 with definition, diagram and example.", "memory": ""}, {"id": 50, "year": 2075, "topic": "Programming", "question": "ACID properties question 50", "answer": "Structured answer for acid properties question 50 with definition, diagram and example.", "memory": ""}, {"id": 51, "year": 2076, "topic": "Networking", "question": "ER diagram question 51", "answer": "Structured answer for er diagram question 51 with definition, diagram and example.", "memory": ""}, {"id": 52, "year": 2077, "topic": "DBMS", "question": "Subnetting CIDR question 52", "answer": "Structured answer for subnetting cidr question 52 with definition, diagram and example.", "memory": "Quick cue 52"}, {"id": 53, "year": 2078, "topic": "Security", "question": "PHP forms question 53", "answer": "Structured answer for php forms question 53 with definition, diagram and example.", "memory": ""}, {"id": 54, "year": 2079, "topic": "Theory", "question": "HTML5 semantics question 54", "answer": "Structured answer for html5 semantics question 54 with definition, diagram and example.", "memory": ""}, {"id": 55, "year": 2080, "topic": "Numerical", "question": "C++ polymorphism question 55", "answer": "Structured answer for c++ polymorphism question 55 with definition, diagram and example.", "memory": ""}];
+let activeYear='all', activeTopic='all';
+const years=['all',2074,2075,2076,2077,2078,2079,2080];
+const topics=['all',...new Set(PAST_QUESTIONS.map(q=>q.topic))];
+const learned=JSON.parse(localStorage.getItem('learned_12')||'{}');
+const yWrap=document.getElementById('yearFilters'); years.forEach(y=>{const b=document.createElement('button');b.className='btn btn-sm btn-outline-primary';b.textContent=y;b.onclick=()=>{activeYear=y;render()};yWrap.appendChild(b)});
+const tWrap=document.getElementById('topicFilters'); topics.forEach(t=>{const b=document.createElement('button');b.className='btn btn-sm btn-outline-secondary';b.textContent=t;b.onclick=()=>{activeTopic=t;render()};tWrap.appendChild(b)});
+function render(){
+  const s=document.getElementById('searchQ').value.toLowerCase();
+  const list=PAST_QUESTIONS.filter(q=>(activeYear==='all'||q.year===activeYear)&&(activeTopic==='all'||q.topic===activeTopic)&&q.question.toLowerCase().includes(s));
+  const wrap=document.getElementById('questionList');wrap.innerHTML='';
+  list.forEach(q=>{const card=document.createElement('div');card.className='past-card';const mem=q.memory?`<span class="badge badge-memory">Memory Trick</span>`:'';card.innerHTML=`<div class="d-flex justify-content-between gap-2"><strong>${q.question}</strong>${mem}</div><div class="small text-muted">${q.year} BS • ${q.topic}</div><details class="mt-2"><summary>Show answer</summary><p>${q.answer}</p>${q.memory?`<p><b>Trick:</b> ${q.memory}</p>`:''}</details><button class="btn btn-sm btn-accent learn-btn mt-2">${learned[q.id]?'Learned ✓':'Mark as Learned'}</button>`;
+    card.querySelector('.learn-btn').onclick=()=>{learned[q.id]=!learned[q.id];localStorage.setItem('learned_12',JSON.stringify(learned));render()};
+    wrap.appendChild(card)});
+  const learnedCount=Object.values(learned).filter(Boolean).length;document.getElementById('learnedProgress').textContent=`${learnedCount}/55`;
+}
+document.getElementById('searchQ').addEventListener('input',render);render();
+</script>
+
+<footer class="site-footer py-4 mt-5">
+  <div class="container d-flex flex-wrap justify-content-between gap-3">
+    <div>© 2026 NEB Computer Science</div>
+    <div class="d-flex gap-3">
+      <a href="../../grade11/index.html">Grade 11</a>
+      <a href="../../grade12/index.html">Grade 12</a>
+      <a href="../../quiz/index.html">Quiz</a>
+      <a href="../../admin/index.php">Admin</a>
+    </div>
+  </div>
+</footer>
+<button class="scroll-top" id="scrollTop"><i class="fa-solid fa-arrow-up"></i></button>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../../assets/js/main.js"></script>
+
+</body>
+</html>
