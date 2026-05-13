@@ -272,12 +272,9 @@ ema20 = ta.ema(close, 20)
 ema50 = ta.ema(close, 50)
 ema200 = ta.ema(close, 200)
 
-bias = ema20 > ema50 and ema50 > ema200 ? 1 :
-       ema20 < ema50 and ema50 < ema200 ? -1 : 0
+bias = ema20 > ema50 and ema50 > ema200 ? 1 : ema20 < ema50 and ema50 < ema200 ? -1 : 0
 
-biasColor = bias == 1 ? color.new(color.green, 90) :
-            bias == -1 ? color.new(color.red, 90) :
-            color.new(color.gray, 90)
+biasColor = bias == 1 ? color.new(color.green, 90) : bias == -1 ? color.new(color.red, 90) : color.new(color.gray, 90)
 
 bgcolor(showBias ? biasColor : na, title="Market Bias Background")
 
@@ -285,12 +282,8 @@ bgcolor(showBias ? biasColor : na, title="Market Bias Background")
 var label biasLabel = na
 if showBias and barstate.islast
     label.delete(biasLabel)
-    biasText = bias == 1 ? "BULLISH BIAS" :
-               bias == -1 ? "BEARISH BIAS" :
-               "NEUTRAL"
-    biasLabelColor = bias == 1 ? color.green :
-                     bias == -1 ? color.red :
-                     color.gray
+    biasText = bias == 1 ? "BULLISH BIAS" : bias == -1 ? "BEARISH BIAS" : "NEUTRAL"
+    biasLabelColor = bias == 1 ? color.green : bias == -1 ? color.red : color.gray
     biasLabel := label.new(bar_index, high, biasText,
          style=label.style_label_down,
          color=color.new(biasLabelColor, 0),
