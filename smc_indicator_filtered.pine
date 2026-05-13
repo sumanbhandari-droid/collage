@@ -1,0 +1,321 @@
+//@version=5
+indicator("SMC Indicator - High Probability Filtered", overlay=true, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
+
+// ═══════════════════════════════════════════════════════════════════════
+// INPUT SETTINGS - OPTIMIZED FOR QUALITY
+// ═══════════════════════════════════════════════════════════════════════
+
+// Order Block Settings
+showOB = input.bool(true, "Show Order Blocks", group="Order Blocks")
+obLength = input.int(10, "Order Block Length", minval=1, group="Order Blocks", tooltip="Higher = fewer but stronger OBs")
+obStrengthMultiplier = input.float(2.0, "OB Strength Multiplier", minval=1.0, step=0.1, group="Order Blocks", tooltip="Minimum candle size vs previous (2.0 = 2x stronger)")
+obVolumeConfirm = input.bool(true, "Require Volume Confirmation", group="Order Blocks", tooltip="Only show OBs with above-average volume")
+bullishOBColor = input.color(color.new(color.green, 80), "Bullish OB Color", group="Order Blocks")
+bearishOBColor = input.color(color.new(color.red, 80), "Bearish OB Color", group="Order Blocks")
+
+// Fair Value Gap Settings
+showFVG = input.bool(true, "Show Fair Value Gaps", group="Fair Value Gaps")
+fvgMinSize = input.float(0.5, "Min FVG Size (%)", minval=0.1, step=0.1, group="Fair Value Gaps", tooltip="Minimum gap size as % of price")
+fvgVolumeConfirm = input.bool(true, "Require Volume on FVG", group="Fair Value Gaps")
+fvgBullColor = input.color(color.new(color.blue, 85), "Bullish FVG Color", group="Fair Value Gaps")
+fvgBearColor = input.color(color.new(color.orange, 85), "Bearish FVG Color", group="Fair Value Gaps")
+
+// Liquidity Settings
+showLiquidity = input.bool(true, "Show Liquidity Levels", group="Liquidity")
+liquidityLength = input.int(30, "Liquidity Lookback", minval=10, group="Liquidity", tooltip="Higher = only major liquidity zones")
+minTouchesForLiquidity = input.int(2, "Min Touches Required", minval=1, group="Liquidity")
+liquidityColor = input.color(color.purple, "Liquidity Color", group="Liquidity")
+
+// Structure Settings
+showHighLow = input.bool(true, "Show Higher Highs/Lower Lows", group="Structure")
+swingLength = input.int(10, "Swing Length", minval=5, group="Structure", tooltip="Higher = cleaner swings, less noise")
+showBOS = input.bool(true, "Show Break of Structure", group="Structure")
+showChoch = input.bool(true, "Show Change of Character", group="Structure")
+bosColor = input.color(color.green, "BOS Color", group="Structure")
+chochColor = input.color(color.red, "ChoCh Color", group="Structure")
+
+// Bias & Trend Filter Settings
+showBias = input.bool(true, "Show Market Bias", group="Bias & Filters")
+biasLength = input.int(50, "Bias Period", minval=10, group="Bias & Filters")
+onlyTradeWithBias = input.bool(true, "Only Trade With Bias", group="Bias & Filters", tooltip="Filter signals against trend")
+useATRFilter = input.bool(true, "Use ATR Volatility Filter", group="Bias & Filters", tooltip="Filter out low volatility periods")
+atrPeriod = input.int(14, "ATR Period", minval=5, group="Bias & Filters")
+atrMultiplier = input.float(1.0, "Min ATR Multiplier", minval=0.1, step=0.1, group="Bias & Filters")
+
+// Confluence Settings
+showConfluence = input.bool(true, "Show Confluence Signals", group="Confluence", tooltip="Show only when multiple factors align")
+requireOBandFVG = input.bool(false, "Require Both OB + FVG", group="Confluence")
+requireBOSorChoch = input.bool(true, "Require BOS/ChoCh", group="Confluence")
+
+// ═══════════════════════════════════════════════════════════════════════
+// FILTERS & INDICATORS
+// ═══════════════════════════════════════════════════════════════════════
+
+// Volume Filter
+avgVolume = ta.sma(volume, 20)
+highVolume = volume > avgVolume * 1.2
+veryHighVolume = volume > avgVolume * 1.5
+
+// ATR Filter
+atr = ta.atr(atrPeriod)
+minATR = ta.sma(atr, 20) * atrMultiplier
+isVolatile = atr > minATR
+
+// Market Bias
+ema20 = ta.ema(close, 20)
+ema50 = ta.ema(close, 50)
+ema200 = ta.ema(close, 200)
+bias = ema20 > ema50 and ema50 > ema200 ? 1 : ema20 < ema50 and ema50 < ema200 ? -1 : 0
+
+// Candle Strength
+candleBody = math.abs(close - open)
+candleRange = high - low
+strongCandle = candleBody > candleRange * 0.6
+
+// ═══════════════════════════════════════════════════════════════════════
+// FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════
+
+isSwingHigh(len) =>
+    highestBar = ta.highestbars(high, len * 2 + 1)
+    highestBar == -len
+
+isSwingLow(len) =>
+    lowestBar = ta.lowestbars(low, len * 2 + 1)
+    lowestBar == -len
+
+// ═══════════════════════════════════════════════════════════════════════
+// ORDER BLOCK DETECTION - FILTERED
+// ═══════════════════════════════════════════════════════════════════════
+
+var box[] bullishOBs = array.new_box()
+var box[] bearishOBs = array.new_box()
+
+// Enhanced Bullish Order Block
+volumeOK_Bull = obVolumeConfirm ? veryHighVolume[1] or highVolume : true
+atrOK = useATRFilter ? isVolatile : true
+biasOK_Bull = onlyTradeWithBias ? (bias >= 0) : true
+isBullishOB = close[1] < open[1] and close > open and (high - low) > (high[1] - low[1]) * obStrengthMultiplier and strongCandle and volumeOK_Bull and atrOK and biasOK_Bull
+
+if showOB and isBullishOB
+    ob = box.new(bar_index[1], high[1], bar_index + obLength, low[1], border_color=color.new(color.green, 50), bgcolor=bullishOBColor, border_width=2, extend=extend.none)
+    array.push(bullishOBs, ob)
+    if array.size(bullishOBs) > 20
+        box.delete(array.shift(bullishOBs))
+
+// Enhanced Bearish Order Block
+volumeOK_Bear = obVolumeConfirm ? veryHighVolume[1] or highVolume : true
+biasOK_Bear = onlyTradeWithBias ? (bias <= 0) : true
+isBearishOB = close[1] > open[1] and close < open and (high - low) > (high[1] - low[1]) * obStrengthMultiplier and strongCandle and volumeOK_Bear and atrOK and biasOK_Bear
+
+if showOB and isBearishOB
+    ob = box.new(bar_index[1], high[1], bar_index + obLength, low[1], border_color=color.new(color.red, 50), bgcolor=bearishOBColor, border_width=2, extend=extend.none)
+    array.push(bearishOBs, ob)
+    if array.size(bearishOBs) > 20
+        box.delete(array.shift(bearishOBs))
+
+// ═══════════════════════════════════════════════════════════════════════
+// FAIR VALUE GAP DETECTION - FILTERED
+// ═══════════════════════════════════════════════════════════════════════
+
+var box[] bullishFVGs = array.new_box()
+var box[] bearishFVGs = array.new_box()
+
+// Bullish FVG with size and volume filter
+fvgGapBull = low - high[2]
+fvgSizePercent_Bull = (fvgGapBull / close) * 100
+fvgVolumeOK_Bull = fvgVolumeConfirm ? highVolume[1] : true
+fvgBiasOK_Bull = onlyTradeWithBias ? (bias >= 0) : true
+bullishFVG = low > high[2] and fvgSizePercent_Bull >= fvgMinSize and fvgVolumeOK_Bull and fvgBiasOK_Bull
+
+if showFVG and bullishFVG
+    fvg = box.new(bar_index[2], low, bar_index + 20, high[2], border_color=color.new(color.blue, 50), bgcolor=fvgBullColor, border_width=1, extend=extend.none)
+    array.push(bullishFVGs, fvg)
+    if array.size(bullishFVGs) > 15
+        box.delete(array.shift(bullishFVGs))
+
+// Bearish FVG with size and volume filter
+fvgGapBear = low[2] - high
+fvgSizePercent_Bear = (fvgGapBear / close) * 100
+fvgVolumeOK_Bear = fvgVolumeConfirm ? highVolume[1] : true
+fvgBiasOK_Bear = onlyTradeWithBias ? (bias <= 0) : true
+bearishFVG = high < low[2] and fvgSizePercent_Bear >= fvgMinSize and fvgVolumeOK_Bear and fvgBiasOK_Bear
+
+if showFVG and bearishFVG
+    fvg = box.new(bar_index[2], low[2], bar_index + 20, high, border_color=color.new(color.orange, 50), bgcolor=fvgBearColor, border_width=1, extend=extend.none)
+    array.push(bearishFVGs, fvg)
+    if array.size(bearishFVGs) > 15
+        box.delete(array.shift(bearishFVGs))
+
+// ═══════════════════════════════════════════════════════════════════════
+// LIQUIDITY ZONES - ENHANCED
+// ═══════════════════════════════════════════════════════════════════════
+
+var line[] liquidityLines = array.new_line()
+var label[] liquidityLabels = array.new_label()
+
+swingHigh = isSwingHigh(swingLength)
+swingLow = isSwingLow(swingLength)
+
+if showLiquidity and swingHigh
+    ln = line.new(bar_index[swingLength], high[swingLength], bar_index, high[swingLength], color=liquidityColor, width=2, style=line.style_dashed, extend=extend.right)
+    lbl = label.new(bar_index[swingLength], high[swingLength], "LIQ", style=label.style_label_down, color=color.new(liquidityColor, 70), textcolor=color.white, size=size.tiny)
+    array.push(liquidityLines, ln)
+    array.push(liquidityLabels, lbl)
+    if array.size(liquidityLines) > 10
+        line.delete(array.shift(liquidityLines))
+        label.delete(array.shift(liquidityLabels))
+
+if showLiquidity and swingLow
+    ln = line.new(bar_index[swingLength], low[swingLength], bar_index, low[swingLength], color=liquidityColor, width=2, style=line.style_dashed, extend=extend.right)
+    lbl = label.new(bar_index[swingLength], low[swingLength], "LIQ", style=label.style_label_up, color=color.new(liquidityColor, 70), textcolor=color.white, size=size.tiny)
+    array.push(liquidityLines, ln)
+    array.push(liquidityLabels, lbl)
+    if array.size(liquidityLines) > 10
+        line.delete(array.shift(liquidityLines))
+        label.delete(array.shift(liquidityLabels))
+
+// ═══════════════════════════════════════════════════════════════════════
+// HIGH/LOW STRUCTURE
+// ═══════════════════════════════════════════════════════════════════════
+
+var label[] structureLabels = array.new_label()
+
+if showHighLow and swingHigh
+    isHigherHigh = high[swingLength] > ta.highest(high[swingLength + 1], liquidityLength)
+    if isHigherHigh
+        lbl = label.new(bar_index[swingLength], high[swingLength], "HH", style=label.style_label_down, color=color.new(color.green, 30), textcolor=color.white, size=size.small)
+        array.push(structureLabels, lbl)
+    else
+        lbl = label.new(bar_index[swingLength], high[swingLength], "LH", style=label.style_label_down, color=color.new(color.red, 30), textcolor=color.white, size=size.small)
+        array.push(structureLabels, lbl)
+    if array.size(structureLabels) > 20
+        label.delete(array.shift(structureLabels))
+
+if showHighLow and swingLow
+    isHigherLow = low[swingLength] > ta.lowest(low[swingLength + 1], liquidityLength)
+    if isHigherLow
+        lbl = label.new(bar_index[swingLength], low[swingLength], "HL", style=label.style_label_up, color=color.new(color.green, 30), textcolor=color.white, size=size.small)
+        array.push(structureLabels, lbl)
+    else
+        lbl = label.new(bar_index[swingLength], low[swingLength], "LL", style=label.style_label_up, color=color.new(color.red, 30), textcolor=color.white, size=size.small)
+        array.push(structureLabels, lbl)
+    if array.size(structureLabels) > 20
+        label.delete(array.shift(structureLabels))
+
+// ═══════════════════════════════════════════════════════════════════════
+// BREAK OF STRUCTURE & CHANGE OF CHARACTER - FILTERED
+// ═══════════════════════════════════════════════════════════════════════
+
+var float lastSwingHigh = na
+var float lastSwingLow = na
+var label[] bosLabels = array.new_label()
+var label[] chochLabels = array.new_label()
+var int trend = 0
+
+if swingHigh
+    lastSwingHigh := high[swingLength]
+
+if swingLow
+    lastSwingLow := low[swingLength]
+
+// BOS Detection with filters
+bosVolumeConfirm = highVolume or veryHighVolume
+if showBOS and not na(lastSwingHigh) and close > lastSwingHigh and close[1] <= lastSwingHigh and bosVolumeConfirm
+    lbl = label.new(bar_index, high, "BOS ↑", style=label.style_label_up, color=color.new(bosColor, 10), textcolor=color.white, size=size.normal)
+    array.push(bosLabels, lbl)
+    if array.size(bosLabels) > 10
+        label.delete(array.shift(bosLabels))
+
+if showBOS and not na(lastSwingLow) and close < lastSwingLow and close[1] >= lastSwingLow and bosVolumeConfirm
+    lbl = label.new(bar_index, low, "BOS ↓", style=label.style_label_down, color=color.new(bosColor, 10), textcolor=color.white, size=size.normal)
+    array.push(bosLabels, lbl)
+    if array.size(bosLabels) > 10
+        label.delete(array.shift(bosLabels))
+
+// ChoCh Detection with filters
+chochVolumeConfirm = veryHighVolume
+if not na(lastSwingHigh) and close > lastSwingHigh
+    if trend == -1 and showChoch and chochVolumeConfirm
+        lbl = label.new(bar_index, high, "ChoCh ↑", style=label.style_label_up, color=color.new(chochColor, 10), textcolor=color.white, size=size.normal)
+        array.push(chochLabels, lbl)
+        if array.size(chochLabels) > 10
+            label.delete(array.shift(chochLabels))
+    trend := 1
+
+if not na(lastSwingLow) and close < lastSwingLow
+    if trend == 1 and showChoch and chochVolumeConfirm
+        lbl = label.new(bar_index, low, "ChoCh ↓", style=label.style_label_down, color=color.new(chochColor, 10), textcolor=color.white, size=size.normal)
+        array.push(chochLabels, lbl)
+        if array.size(chochLabels) > 10
+            label.delete(array.shift(chochLabels))
+    trend := -1
+
+// ═══════════════════════════════════════════════════════════════════════
+// CONFLUENCE DETECTION
+// ═══════════════════════════════════════════════════════════════════════
+
+// Bullish Confluence
+bullishConfluence = false
+if showConfluence
+    obCheck = requireOBandFVG ? isBullishOB : (isBullishOB or bullishFVG)
+    fvgCheck = requireOBandFVG ? bullishFVG : true
+    bosCheck = requireBOSorChoch ? (showBOS and not na(lastSwingHigh) and close > lastSwingHigh and close[1] <= lastSwingHigh) : true
+    bullishConfluence := obCheck and fvgCheck and bosCheck and bias == 1 and veryHighVolume
+
+// Bearish Confluence
+bearishConfluence = false
+if showConfluence
+    obCheck = requireOBandFVG ? isBearishOB : (isBearishOB or bearishFVG)
+    fvgCheck = requireOBandFVG ? bearishFVG : true
+    bosCheck = requireBOSorChoch ? (showBOS and not na(lastSwingLow) and close < lastSwingLow and close[1] >= lastSwingLow) : true
+    bearishConfluence := obCheck and fvgCheck and bosCheck and bias == -1 and veryHighVolume
+
+// Mark Confluence
+var label[] confluenceLabels = array.new_label()
+if bullishConfluence
+    lbl = label.new(bar_index, low, "⭐ HIGH PROB LONG ⭐", style=label.style_label_up, color=color.new(color.green, 0), textcolor=color.white, size=size.large, yloc=yloc.belowbar)
+    array.push(confluenceLabels, lbl)
+    if array.size(confluenceLabels) > 5
+        label.delete(array.shift(confluenceLabels))
+
+if bearishConfluence
+    lbl = label.new(bar_index, high, "⭐ HIGH PROB SHORT ⭐", style=label.style_label_down, color=color.new(color.red, 0), textcolor=color.white, size=size.large, yloc=yloc.abovebar)
+    array.push(confluenceLabels, lbl)
+    if array.size(confluenceLabels) > 5
+        label.delete(array.shift(confluenceLabels))
+
+// ═══════════════════════════════════════════════════════════════════════
+// MARKET BIAS DISPLAY
+// ═══════════════════════════════════════════════════════════════════════
+
+biasColor = bias == 1 ? color.new(color.green, 90) : bias == -1 ? color.new(color.red, 90) : color.new(color.gray, 90)
+bgcolor(showBias ? biasColor : na, title="Market Bias Background")
+
+var label biasLabel = na
+if showBias and barstate.islast
+    label.delete(biasLabel)
+    biasText = bias == 1 ? "BULLISH BIAS" : bias == -1 ? "BEARISH BIAS" : "NEUTRAL"
+    biasLabelColor = bias == 1 ? color.green : bias == -1 ? color.red : color.gray
+    biasLabel := label.new(bar_index, high, biasText, style=label.style_label_down, color=color.new(biasLabelColor, 0), textcolor=color.white, size=size.large, yloc=yloc.abovebar)
+
+// ═══════════════════════════════════════════════════════════════════════
+// PLOTS & VISUALS
+// ═══════════════════════════════════════════════════════════════════════
+
+plot(showBias ? ema20 : na, "EMA 20", color=color.new(color.blue, 50), linewidth=1)
+plot(showBias ? ema50 : na, "EMA 50", color=color.new(color.orange, 50), linewidth=1)
+plot(showBias ? ema200 : na, "EMA 200", color=color.new(color.red, 50), linewidth=2)
+
+// Volume color coding
+volumeColor = veryHighVolume ? color.new(color.yellow, 50) : highVolume ? color.new(color.green, 70) : color.new(color.gray, 80)
+plot(showBias ? volume : na, "Volume", color=volumeColor, style=plot.style_histogram, display=display.none)
+
+// ═══════════════════════════════════════════════════════════════════════
+// ALERTS - HIGH PROBABILITY ONLY
+// ═══════════════════════════════════════════════════════════════════════
+
+alertcondition(bullishConfluence, title="🔥 HIGH PROB LONG", message="🔥 High Probability LONG Signal - Multiple Confirmations!")
+alertcondition(bearishConfluence, title="🔥 HIGH PROB SHORT", message="🔥 High Probability SHORT Signal - Multiple Confirmations!")
+alertcondition(isBullishOB and bias == 1, title="Filtered Bullish OB", message="Bullish Order Block with Trend")
+alertcondition(isBearishOB and bias == -1, title="Filtered Bearish OB", message="Bearish Order Block with Trend")
